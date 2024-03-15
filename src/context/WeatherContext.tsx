@@ -15,14 +15,7 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<null | unknown>(null);
   const [lat, setLat] = useState(0);
   const [long, setLong] = useState(0);
-  const [queryResponse, setQueryResponse] = useState<IQueryData[]>([    {
-    lat: 0,
-    long: 0,
-  },
-  {
-    lat: 0,
-    long: 0,
-  },]);
+  const [queryResponse, setQueryResponse] = useState<IQueryData[]>([]);
   const [forecast, setForecast] = useState<IForecastData[]>([]);
 
   const fetchWeather = async () => {
@@ -71,17 +64,7 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
           appid: import.meta.env.VITE_APP_API_ID,
         },
       });
-      setQueryResponse([
-        {
-          lat: 0,
-          long: 0,
-        },
-        {
-          lat: 0,
-          long: 0,
-        },
-      ]);
-      // setQueryResponse(response?.data);
+      setQueryResponse(response?.data);
     } catch (error: unknown) {
       setError(error);
     } finally {
@@ -106,6 +89,7 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
         fetchForecast,
         fetchGeo,
         queryResponse,
+        forecast,
       }}
     >
       {children}

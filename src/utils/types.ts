@@ -1,4 +1,4 @@
-import { IQueryData, IWeatherData } from "./Interface";
+import { IForecastData, IQueryData, IWeatherData } from "./Interface";
 
 export type WeatherContextData = {
   weather: IWeatherData;
@@ -7,5 +7,6 @@ export type WeatherContextData = {
   fetchWeather: () => void;
   fetchForecast: () => void;
   fetchGeo: (q: string) => void;
-  queryResponse: IQueryData;
+  queryResponse: IQueryData[];
+  forecast: IForecastData[];
 };

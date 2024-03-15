@@ -26,6 +26,13 @@ export default function Search() {
     WeatherContext
   ) as WeatherContextData;
 
+  //   add search function that calls the fetchGeo function with the location string.
+  //   Then display the results of the search in the combobox dropdown options.
+  //   when any of the options is selected from the dropdown or enter is selected, first item is used if nothing is selected.
+  //   when selected the long and lat from the selected query response is inputted into the weather function.
+  //   call the fetchWeather function with the selected lon and lat.
+  //    lastly call the fetchForecast function
+
   return (
     <Combobox as="div" value={selectedPerson} onChange={setSelectedPerson}>
       <Combobox.Label className="block text-sm font-medium leading-6 text-gray-900">
