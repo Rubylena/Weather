@@ -1,21 +1,24 @@
-import React from "react";
-import { WeatherContext } from "../context/WeatherContext";
-import { WeatherContextData } from "../utils/types";
+import { useState } from "react";
 import Search from "../components/Search";
+import { IQueryData } from "../utils/Interface";
+import WeatherCard from "../components/WeatherCard";
 
 const Home = () => {
-  const { fetchWeather, fetchForecast, fetchGeo } = React.useContext(
-    WeatherContext
-  ) as WeatherContextData;
+  const [selectedQuery, setSelectedQuery] = useState<IQueryData | null>(null);
 
   return (
     <div className="flex flex-col gap-10">
       <p>Home</p>
-      <button onClick={() => fetchWeather()}>get weather</button>
-      <button onClick={() => fetchForecast()}>get forecast</button>
-      <button onClick={() => fetchGeo('Lagos, Ng')}>get Geo</button>
 
-      <Search />
+      <Search
+        selectedQuery={selectedQuery}
+        setSelectedQuery={setSelectedQuery}
+      />
+
+      <WeatherCard
+        lat={selectedQuery && selectedQuery.lat}
+        long={selectedQuery && selectedQuery.lon}
+      />
     </div>
   );
 };

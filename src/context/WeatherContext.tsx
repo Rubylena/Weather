@@ -12,47 +12,53 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
   const [weather, setWeather] = useState<IWeatherData>({
     temperature: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<null | unknown>(null);
-  const [lat, setLat] = useState(0);
-  const [long, setLong] = useState(0);
-  // const [queryResponse, setQueryResponse] = useState<IQueryData[]>([]);
-  const [forecast, setForecast] = useState<IForecastData[]>([]);
 
-  const fetchWeather = async () => {
-    setIsLoading(true);
+  const [forecast, setForecast] = useState<IForecastData[]>([{
+    weather: [
+      {
+        id: 0,
+        main: "",
+        description: "",
+        icon: "",
+      },
+    ],
+  }]);
+
+  const fetchWeather = async (
+    latitude: number,
+    longitude: number
+  ): Promise<IWeatherData | AxiosError> => {
     try {
       const response = await axiosClient.get("weather", {
         params: {
-          lat: lat,
-          lon: long,
+          lat: latitude,
+          lon: longitude,
           appid: import.meta.env.VITE_APP_API_ID,
         },
       });
-      setWeather(response?.data);
+      return response?.data;
     } catch (error: unknown) {
-      setError(error);
-    } finally {
-      setIsLoading(false);
+      return error as AxiosError;
     }
   };
 
-  const fetchForecast = async () => {
-    setIsLoading(true);
+  const fetchForecast = async (
+    latitude: number,
+    longitude: number,
+    cnt: number
+  ): Promise<IForecastData[] | AxiosError> => {
     try {
       const response = await axiosClient.get("forecast", {
         params: {
-          lat: lat,
-          lon: long,
-          cnt: 7,
+          lat: latitude,
+          lon: longitude,
+          cnt: cnt,
           appid: import.meta.env.VITE_APP_API_ID,
         },
       });
-      setForecast(response?.data);
+      return response?.data;
     } catch (error: unknown) {
-      setError(error);
-    } finally {
-      setIsLoading(false);
+      return error as AxiosError;
     }
   };
 
@@ -65,29 +71,54 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
         },
       });
       return response?.data;
-      // return response?.data as IQueryData
     } catch (error: unknown) {
       return error as AxiosError;
     }
   };
 
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(function (position) {
-      setLat(position.coords.latitude);
-      setLong(position.coords.longitude);
+  const defaultLocation = async () => {
+    navigator.geolocation.getCurrentPosition(async function (position) {
+      try {
+        const response = await fetchWeather(
+          position.coords.latitude,
+          position.coords.longitude
+        );
+        setWeather(response as IWeatherData);
+      } catch (error) {
+        console.log(error);
+      }
     });
-  }, [lat, long]);
+  };
+  const defaultLocationForecast = async () => {
+    navigator.geolocation.getCurrentPosition(async function (position) {
+      try {
+        const response = await fetchForecast(
+          position.coords.latitude,
+          position.coords.longitude,
+          7
+        );
+        setForecast(response as IForecastData[]);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  };
+
+  useEffect(() => {
+    defaultLocation();
+    defaultLocationForecast();
+  }, []);
 
   return (
     <WeatherContext.Provider
       value={{
         weather,
-        isLoading,
-        error,
+        setWeather,
+        forecast,
+        setForecast,
         fetchWeather,
         fetchForecast,
         fetchGeo,
-        forecast,
       }}
     >
       {children}

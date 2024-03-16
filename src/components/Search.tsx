@@ -1,82 +1,57 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useState } from "react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox } from "@headlessui/react";
 import { WeatherContext } from "../context/WeatherContext";
 import { WeatherContextData } from "../utils/types";
-import { toast } from "react-toastify";
-import { IQueryData } from "../utils/Interface";
+// import { toast } from "react-toastify";
+import { IQueryData, ISearchProps } from "../utils/Interface";
 import { useDebounce } from "../helpers/debounce";
-
-// const people = [{ id: 1, name: "Leslie Alexander" }];
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Search() {
+export default function Search(props: ISearchProps) {
   const [query, setQuery] = useState("");
-  const [selectedQuery, setSelectedQuery] = useState(null);
+  // const [selectedQuery, setSelectedQuery] = useState<IQueryData | null>(null);
   const [queryResponse, setQueryResponse] = useState<IQueryData[]>([]);
   const [geoLoading, setGeoLoading] = useState(false);
-  // const [filteredQuery, setFilteredQuery] = useState<IQueryData[]>([]);
-
+  const { selectedQuery, setSelectedQuery } = props;
   const { fetchGeo } = React.useContext(WeatherContext) as WeatherContextData;
 
   const debouncedSearch = useDebounce(query, 500);
 
-  //   add search function that calls the fetchGeo function with the location string.
-  const handleSearch = async (q: string) => {
-    console.log(q);
-    if (!q) {
-      return;
-    }
-    setGeoLoading(true);
-    try {
-      const data = await fetchGeo(q);
-      console.log("data", data);
-      setQueryResponse(data as IQueryData[]);
-      // setQueryResponse(data as IQueryData[]);
-    } catch (e: unknown) {
-      console.log("error", e);
-      toast.error(e?.response.message);
-    } finally {
-      setGeoLoading(false);
-    }
-  };
+  const handleSearch = useCallback(
+    async (q: string) => {
+      if (!q) {
+        return;
+      }
 
-  //   Then display the results of the search in the combobox dropdown options.
-  //   when any of the options is selected from the dropdown or enter is selected, first item is used if nothing is selected.
-  //   when selected the long and lat from the selected query response is inputted into the weather function.
-  //   call the fetchWeather function with the selected lon and lat.
-  //    lastly call the fetchForecast function
-  const filteredQuery =
-    query === ""
-      ? queryResponse
-      : queryResponse?.filter((response) => {
-          return response?.name.toLowerCase().includes(query.toLowerCase());
-        });
+      setGeoLoading(true);
 
+      try {
+        const data = await fetchGeo(q);
+        setQueryResponse(data as IQueryData[]);
+      } catch (error: unknown) {
+        console.log("error", error);
+        // toast.error(error?.response?.message);
+      } finally {
+        setGeoLoading(false);
+      }
+    },
+    [fetchGeo]
+  );
+
+  //   Then display the results of the search in the combobox dropdown options. Done
+  //   when any of the options is selected from the dropdown or enter is selected, first item is used if nothing is selected. Done
   useEffect(() => {
-    // Update params with the latest debounced search text
     if (debouncedSearch) {
-      console.log("debounced", debouncedSearch);
       setQuery(debouncedSearch);
+      handleSearch(debouncedSearch);
     }
-    if (query) {
-      handleSearch(query);
-    }
-  }, [debouncedSearch, query]);
-
-  // useEffect(() => {
-  //   handleSearch(query);
-  // }, [query]);
-  // useEffect(() => {
-  //   // useCallback here
-  //   setFilteredQuery(filteredQuerySyntax);
-  //   console.log("query response", queryResponse);
-  //   console.log("filtered", filteredQuerySyntax);
-  // }, [queryResponse, query]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
 
   return (
     <Combobox as="div" value={selectedQuery} onChange={setSelectedQuery}>
@@ -88,12 +63,8 @@ export default function Search() {
           className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           onChange={(event) => {
             setQuery(event.target.value);
-            // debouncedSearch(event.target.value);
           }}
-          // onBlur={() => debouncedSearch(query)}
-          // displayValue={(person) => person?.name}
-          displayValue={(name: string) => name}
-          // value={query}
+          placeholder="Search for location with this format: state, country. E.g Lagos, NG"
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
           <ChevronUpDownIcon
@@ -120,12 +91,15 @@ export default function Search() {
           </svg>
         </Combobox.Button>
 
-        {filteredQuery.length > 0 && (
+        {queryResponse.length > 0 && (
           <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-            {filteredQuery.map((filtered, index) => (
+            {queryResponse.map((filtered, index) => (
               <Combobox.Option
                 key={index}
-                value={filtered.name}
+                // value={`${filtered.name}${
+                //   filtered.state && `, ${filtered.state}`
+                // }`}
+                value={filtered}
                 className={({ active }) =>
                   classNames(
                     "relative cursor-default select-none py-2 pl-3 pr-9",

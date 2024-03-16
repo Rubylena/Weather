@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-// type DebouncedFn<T> = (arg: T) => void;
-
 export function useDebounce(arg: string, delay: number): string {
   const [debouncedValue, setDebouncedValue] = useState<string>("");
 
@@ -14,8 +12,6 @@ export function useDebounce(arg: string, delay: number): string {
 
     timeoutRef.current = setTimeout(() => {
       setDebouncedValue(arg);
-      // fn(debouncedValue!);
-      // fn(debouncedValue!);
     }, delay);
 
     return () => {
@@ -26,29 +22,4 @@ export function useDebounce(arg: string, delay: number): string {
   }, [debouncedValue, delay, arg]);
 
   return debouncedValue;
-  // setDebouncedValue(arg);
-  // if (timeoutRef.current) {
-  //   clearTimeout(timeoutRef.current);
-  // }
-  // timeoutRef.current = setTimeout(() => {
-  //   fn(debouncedValue!);
-  // }, delay);
 }
-
-// import { useState, useEffect } from "react";
-
-// export function useDebounce(value, delay) {
-//   const [debouncedValue, setDebouncedValue] = useState(value);
-
-//   useEffect(() => {
-//     const timer = setTimeout(() => {
-//       setDebouncedValue(value);
-//     }, delay);
-
-//     return () => {
-//       clearTimeout(timer);
-//     };
-//   }, [value, delay]);
-
-//   return debouncedValue;
-// }
