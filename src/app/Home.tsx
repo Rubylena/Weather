@@ -2,6 +2,7 @@ import { useState } from "react";
 import Search from "../components/Search";
 import { IQueryData } from "../utils/Interface";
 import WeatherCard from "../components/WeatherCard";
+import Forecast from "../components/Forecast";
 
 const Home = () => {
   const [selectedQuery, setSelectedQuery] = useState<IQueryData | null>(null);
@@ -16,6 +17,11 @@ const Home = () => {
       />
 
       <WeatherCard
+        lat={selectedQuery && selectedQuery.lat}
+        long={selectedQuery && selectedQuery.lon}
+      />
+
+      <Forecast
         lat={selectedQuery && selectedQuery.lat}
         long={selectedQuery && selectedQuery.lon}
       />

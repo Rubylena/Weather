@@ -39,7 +39,7 @@ const Forecast = (props: ICoordProps) => {
     <div>
       {(forecast.length > 0 || forecastLoading) &&
         forecast.map((cast) => (
-          <p key={cast.weather[0].id}>{cast.weather[0].description}</p>
+          <p key={cast.weather[0].id}>Forecast: {cast.weather[0].description}</p>
         ))}
     </div>
   );
