@@ -6,6 +6,8 @@ export interface IWeatherData {
 export interface IQueryData {
   lat: number;
   long: number;
+  name: string;
+  state: string;
   [key: string]: unknown;
 }
 

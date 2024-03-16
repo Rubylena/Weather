@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 import { IForecastData, IQueryData, IWeatherData } from "../utils/Interface";
 import axiosClient, { axiosGeoClient } from "../services/api";
 import { WeatherContextData } from "../utils/types";
+import { AxiosError } from "axios";
 
 const WeatherContext = createContext<WeatherContextData | null>(null);
 
@@ -15,7 +16,7 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<null | unknown>(null);
   const [lat, setLat] = useState(0);
   const [long, setLong] = useState(0);
-  const [queryResponse, setQueryResponse] = useState<IQueryData[]>([]);
+  // const [queryResponse, setQueryResponse] = useState<IQueryData[]>([]);
   const [forecast, setForecast] = useState<IForecastData[]>([]);
 
   const fetchWeather = async () => {
@@ -55,8 +56,7 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const fetchGeo = async (q: string) => {
-    setIsLoading(true);
+  const fetchGeo = async (q: string): Promise<IQueryData[] | AxiosError> => {
     try {
       const response = await axiosGeoClient.get("geo/1.0/direct", {
         params: {
@@ -64,11 +64,10 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
           appid: import.meta.env.VITE_APP_API_ID,
         },
       });
-      setQueryResponse(response?.data);
+      return response?.data;
+      // return response?.data as IQueryData
     } catch (error: unknown) {
-      setError(error);
-    } finally {
-      setIsLoading(false);
+      return error as AxiosError;
     }
   };
 
@@ -88,7 +87,6 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
         fetchWeather,
         fetchForecast,
         fetchGeo,
-        queryResponse,
         forecast,
       }}
     >

@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { IForecastData, IQueryData, IWeatherData } from "./Interface";
 
 export type WeatherContextData = {
@@ -6,7 +7,6 @@ export type WeatherContextData = {
   error: null | unknown;
   fetchWeather: () => void;
   fetchForecast: () => void;
-  fetchGeo: (q: string) => void;
-  queryResponse: IQueryData[];
+  fetchGeo: (q: string) => Promise<IQueryData[] | AxiosError>;
   forecast: IForecastData[];
 };
