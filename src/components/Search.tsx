@@ -7,6 +7,8 @@ import { WeatherContextData } from "../utils/types";
 import { toast } from "react-toastify";
 import { IQueryData, ISearchProps } from "../utils/Interface";
 import { useDebounce } from "../helpers/debounce";
+import Skeleton from "react-loading-skeleton";
+import { AxiosError } from "axios";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -23,17 +25,24 @@ export default function Search(props: ISearchProps) {
 
   const handleSearch = useCallback(
     async (q: string) => {
+      setQueryResponse([]);
       if (!q) {
+        setQueryResponse([]);
         return;
       }
 
       setGeoLoading(true);
 
       try {
-        const data = await fetchGeo(q);
+        const data = await fetchGeo(q.trim());
         setQueryResponse(data as IQueryData[]);
       } catch (error: unknown) {
-        toast.error(error?.response?.message);
+        setQueryResponse([]);
+        if (error instanceof AxiosError) {
+          toast.error(error?.response?.data?.message);
+        } else {
+          toast.error("An unknown error occurred.");
+        }
       } finally {
         setGeoLoading(false);
       }
@@ -51,13 +60,14 @@ export default function Search(props: ISearchProps) {
   return (
     <Combobox as="div" value={selectedQuery} onChange={setSelectedQuery}>
       <Combobox.Label className="block text-sm font-medium leading-6 text-gray-900">
-        Assigned to
+        Location
       </Combobox.Label>
       <div className="relative mt-2">
         <Combobox.Input
           className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           onChange={(event) => {
-            setQuery(event.target.value);
+            setQuery(event.target.value.trim());
+            setQueryResponse([]);
           }}
           placeholder="Search for location with this format: state, country. E.g Lagos, NG"
         />
@@ -86,7 +96,11 @@ export default function Search(props: ISearchProps) {
           </svg>
         </Combobox.Button>
 
-        {queryResponse.length > 0 && (
+        {geoLoading ? (
+          <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <Skeleton height="2rem" />
+          </Combobox.Options>
+        ) : queryResponse?.length > 0 ? (
           <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
             {queryResponse.map((filtered, index) => (
               <Combobox.Option
@@ -124,6 +138,17 @@ export default function Search(props: ISearchProps) {
                 )}
               </Combobox.Option>
             ))}
+          </Combobox.Options>
+        ) : (
+          <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <Combobox.Option
+              value={""}
+              className={classNames(
+                "relative cursor-default select-none py-3 pl-3 pr-9 text-gray-900 text-center"
+              )}
+            >
+              <span>Nothing to show</span>
+            </Combobox.Option>
           </Combobox.Options>
         )}
       </div>

@@ -3,71 +3,25 @@ import { IForecastData, IQueryData, IWeatherData } from "../utils/Interface";
 import axiosClient, { axiosGeoClient } from "../services/api";
 import { WeatherContextData } from "../utils/types";
 import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
 const WeatherContext = createContext<WeatherContextData | null>(null);
 
 const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [weather, setWeather] = useState<IWeatherData>({
-    weather: [
-      {
-        id: 0,
-        main: "",
-        description: "",
-        icon: "",
-      },
-    ],
-    main: {
-      temp: 0,
-      feels_like: 0,
-      temp_min: 0,
-      temp_max: 0,
-      pressure: 0,
-      humidity: 0,
-      sea_level: 0,
-    },
-    visibility: 0,
-    wind: {
-      speed: 0,
-      deg: 0,
-      gust: 0,
-    },
-  });
+  const [weather, setWeather] = useState<IWeatherData | null>(null);
+  const [defaultWeatherLoading, setDefaultWeatherLoading] = useState(false);
 
-  const [forecast, setForecast] = useState<IForecastData[]>([
-    {
-      weather: [
-        {
-          id: 0,
-          main: "",
-          description: "",
-          icon: "",
-        },
-      ],
-      main: {
-        temp: 0,
-        feels_like: 0,
-        temp_min: 0,
-        temp_max: 0,
-        pressure: 0,
-        humidity: 0,
-      },
-      visibility: 0,
-      wind: {
-        speed: 0,
-        deg: 0,
-        gust: 0,
-      },
-      dt_txt: "",
-    },
-  ]);
+  const [forecast, setForecast] = useState<IForecastData[] | undefined>();
+  const [defaultForecastLoading, setDefaultForecastLoading] = useState(false);
 
   const fetchWeather = async (
     latitude: number,
     longitude: number,
     units: string
   ): Promise<IWeatherData> => {
+    setDefaultWeatherLoading(true);
     try {
       const response = await axiosClient.get("weather", {
         params: {
@@ -81,6 +35,8 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (error: unknown) {
       console.log("Error getting weather data", error);
       throw error;
+    } finally {
+      setDefaultWeatherLoading(false);
     }
   };
 
@@ -89,6 +45,7 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
     longitude: number,
     units: string
   ): Promise<IForecastData[]> => {
+    setDefaultForecastLoading(true);
     try {
       const response = await axiosClient.get("forecast", {
         params: {
@@ -98,10 +55,12 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
           appid: import.meta.env.VITE_APP_API_ID,
         },
       });
-      return response?.data;
+      return response?.data?.list;
     } catch (error: unknown) {
       console.log("Error reading forecast:", error);
       throw error;
+    } finally {
+      setDefaultForecastLoading(false);
     }
   };
 
@@ -121,7 +80,7 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const defaultLocation = useCallback(async () => {
-    navigator.geolocation.getCurrentPosition(async function (position) {
+    navigator.geolocation.getCurrentPosition(async (position) => {
       try {
         const weatherResponse = await fetchWeather(
           position.coords.latitude,
@@ -136,7 +95,11 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
         setWeather(weatherResponse as IWeatherData);
         setForecast(forecastResponse as IForecastData[]);
       } catch (error) {
-        toast.error(error?.response?.data?.message);
+        if (error instanceof AxiosError) {
+          toast.error(error?.response?.data?.message);
+        } else {
+          toast.error("An unknown error occurred.");
+        }
       }
     });
   }, []);
@@ -148,8 +111,10 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <WeatherContext.Provider
       value={{
+        defaultWeatherLoading,
         weather,
         setWeather,
+        defaultForecastLoading,
         forecast,
         setForecast,
         fetchWeather,

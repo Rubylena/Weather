@@ -1,10 +1,12 @@
 import { IForecastData, IQueryData, IWeatherData } from "./Interface";
 
 export type WeatherContextData = {
-  weather: IWeatherData;
-  setWeather: React.Dispatch<React.SetStateAction<IWeatherData>>;
-  forecast: IForecastData[];
-  setForecast: React.Dispatch<React.SetStateAction<IForecastData[]>>;
+  defaultWeatherLoading: boolean;
+  weather: IWeatherData | null;
+  setWeather: React.Dispatch<React.SetStateAction<IWeatherData | null>>;
+  defaultForecastLoading: boolean;
+  forecast: IForecastData[] | undefined;
+  setForecast: React.Dispatch<React.SetStateAction<IForecastData[] | undefined>>;
   fetchWeather: (
     latitude: number,
     longitude: number,

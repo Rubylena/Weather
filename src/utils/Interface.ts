@@ -66,4 +66,5 @@ export interface ISearchProps {
 export interface ICoordProps {
   lat?: number | null;
   long?: number | null;
+  units?: string;
 }

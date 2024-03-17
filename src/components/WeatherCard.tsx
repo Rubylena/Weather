@@ -3,23 +3,28 @@ import { ICoordProps, IWeatherData } from "../utils/Interface";
 import { WeatherContextData } from "../utils/types";
 import { WeatherContext } from "../context/WeatherContext";
 import { toast } from "react-toastify";
+import Skeleton from "react-loading-skeleton";
+import { AxiosError } from "axios";
 
 const WeatherCard = (props: ICoordProps) => {
   const [weatherLoading, setWeatherLoading] = useState(false);
-  const { fetchWeather, weather, setWeather } = React.useContext(
-    WeatherContext
-  ) as WeatherContextData;
-  const { lat, long } = props;
+  const { fetchWeather, weather, setWeather, defaultWeatherLoading } =
+    React.useContext(WeatherContext) as WeatherContextData;
+  const { lat, long, units } = props;
 
   const handleSearchWeather = useCallback(
-    async (lat: number, long: number) => {
+    async (lat: number, long: number, units: string) => {
       setWeatherLoading(true);
 
       try {
-        const data = await fetchWeather(lat, long, "metric");
+        const data = await fetchWeather(lat, long, units);
         setWeather(data as IWeatherData);
       } catch (error: unknown) {
-        toast.error(error?.response?.message);
+        if (error instanceof AxiosError) {
+          toast.error(error?.response?.data?.message);
+        } else {
+          toast.error("An unknown error occurred.");
+        }
       } finally {
         setWeatherLoading(false);
       }
@@ -27,23 +32,25 @@ const WeatherCard = (props: ICoordProps) => {
     [fetchWeather, setWeather]
   );
 
-  //   when selected the long and lat from the selected query response is inputted into the weather function. Done
-  //   call the fetchWeather function with the selected lon and lat. Done
   useEffect(() => {
-    if (lat && long) {
-      handleSearchWeather(lat, long);
+    if (lat && long && units) {
+      handleSearchWeather(lat, long, units);
     }
-  }, [lat, long]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lat, long, units]);
 
   return (
     <>
-      {weatherLoading && (
+      {defaultWeatherLoading || weatherLoading ? (
+        <Skeleton count={10} />
+      ) : weather ? (
         <div>
-          <p>Celsius</p>
-          <p>Fahrenheit</p>
-
-          <p>Temperature: *deg (C if celsius, F if Fahrenheit is selected)</p>
-          <p>humidity: %</p>
+          <p>
+            Temperature: {weather.main.temp}*deg $
+            {units === "metric" ? "C" : "F"}(C if celsius, F if Fahrenheit is
+            selected)
+          </p>
+          <p>humidity: {weather.main.humidity}%</p>
           <p>feels like: </p>
           <p>wind: m/s or km/h</p>
           <p>visibility: </p>
@@ -59,6 +66,8 @@ const WeatherCard = (props: ICoordProps) => {
             />{" "}
           </p>
         </div>
+      ) : (
+        <Skeleton count={10} />
       )}
     </>
   );
