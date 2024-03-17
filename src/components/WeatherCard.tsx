@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ICoordProps, IWeatherData } from "../utils/Interface";
 import { WeatherContextData } from "../utils/types";
 import { WeatherContext } from "../context/WeatherContext";
+import { toast } from "react-toastify";
 
 const WeatherCard = (props: ICoordProps) => {
   const [weatherLoading, setWeatherLoading] = useState(false);
@@ -15,11 +16,10 @@ const WeatherCard = (props: ICoordProps) => {
       setWeatherLoading(true);
 
       try {
-        const data = await fetchWeather(lat, long);
+        const data = await fetchWeather(lat, long, "metric");
         setWeather(data as IWeatherData);
       } catch (error: unknown) {
-        console.log("error", error);
-        // toast.error(error?.response?.message);
+        toast.error(error?.response?.message);
       } finally {
         setWeatherLoading(false);
       }
@@ -36,9 +36,31 @@ const WeatherCard = (props: ICoordProps) => {
   }, [lat, long]);
 
   return (
-    <div>
-      {(weather || weatherLoading) && <p>default: {weather?.main?.temp}</p>}
-    </div>
+    <>
+      {weatherLoading && (
+        <div>
+          <p>Celsius</p>
+          <p>Fahrenheit</p>
+
+          <p>Temperature: *deg (C if celsius, F if Fahrenheit is selected)</p>
+          <p>humidity: %</p>
+          <p>feels like: </p>
+          <p>wind: m/s or km/h</p>
+          <p>visibility: </p>
+          <p>pressure: </p>
+          <p>description: </p>
+          <p>sunrise: (date)</p>
+          <p>sunset: (date)</p>
+          <p>
+            icon:{" "}
+            <img
+              src={`https://openweathermap.org/img/wn/${weather?.weather[0].icon}@2x.png`}
+              alt="weather icon"
+            />{" "}
+          </p>
+        </div>
+      )}
+    </>
   );
 };
 

@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import { IForecastData, IQueryData, IWeatherData } from "./Interface";
 
 export type WeatherContextData = {
@@ -8,12 +7,13 @@ export type WeatherContextData = {
   setForecast: React.Dispatch<React.SetStateAction<IForecastData[]>>;
   fetchWeather: (
     latitude: number,
-    longitude: number
-  ) => Promise<IWeatherData | AxiosError>;
+    longitude: number,
+    units: string
+  ) => Promise<IWeatherData>;
   fetchForecast: (
     latitude: number,
     longitude: number,
-    cnt: number
-  ) => Promise<IForecastData[] | AxiosError>;
-  fetchGeo: (q: string) => Promise<IQueryData[] | AxiosError>;
+    units: string
+  ) => Promise<IForecastData[]>;
+  fetchGeo: (q: string) => Promise<IQueryData[]>;
 };

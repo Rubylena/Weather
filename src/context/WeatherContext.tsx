@@ -1,8 +1,8 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { IForecastData, IQueryData, IWeatherData } from "../utils/Interface";
 import axiosClient, { axiosGeoClient } from "../services/api";
 import { WeatherContextData } from "../utils/types";
-import { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 const WeatherContext = createContext<WeatherContextData | null>(null);
 
@@ -10,10 +10,6 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [weather, setWeather] = useState<IWeatherData>({
-    temperature: "",
-  });
-
-  const [forecast, setForecast] = useState<IForecastData[]>([{
     weather: [
       {
         id: 0,
@@ -22,47 +18,94 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
         icon: "",
       },
     ],
-  }]);
+    main: {
+      temp: 0,
+      feels_like: 0,
+      temp_min: 0,
+      temp_max: 0,
+      pressure: 0,
+      humidity: 0,
+      sea_level: 0,
+    },
+    visibility: 0,
+    wind: {
+      speed: 0,
+      deg: 0,
+      gust: 0,
+    },
+  });
+
+  const [forecast, setForecast] = useState<IForecastData[]>([
+    {
+      weather: [
+        {
+          id: 0,
+          main: "",
+          description: "",
+          icon: "",
+        },
+      ],
+      main: {
+        temp: 0,
+        feels_like: 0,
+        temp_min: 0,
+        temp_max: 0,
+        pressure: 0,
+        humidity: 0,
+      },
+      visibility: 0,
+      wind: {
+        speed: 0,
+        deg: 0,
+        gust: 0,
+      },
+      dt_txt: "",
+    },
+  ]);
 
   const fetchWeather = async (
     latitude: number,
-    longitude: number
-  ): Promise<IWeatherData | AxiosError> => {
+    longitude: number,
+    units: string
+  ): Promise<IWeatherData> => {
     try {
       const response = await axiosClient.get("weather", {
         params: {
           lat: latitude,
           lon: longitude,
+          units: units,
           appid: import.meta.env.VITE_APP_API_ID,
         },
       });
       return response?.data;
     } catch (error: unknown) {
-      return error as AxiosError;
+      console.log("Error getting weather data", error);
+      throw error;
     }
   };
 
   const fetchForecast = async (
     latitude: number,
     longitude: number,
-    cnt: number
-  ): Promise<IForecastData[] | AxiosError> => {
+    units: string
+  ): Promise<IForecastData[]> => {
     try {
       const response = await axiosClient.get("forecast", {
         params: {
           lat: latitude,
           lon: longitude,
-          cnt: cnt,
+          units: units,
           appid: import.meta.env.VITE_APP_API_ID,
         },
       });
       return response?.data;
     } catch (error: unknown) {
-      return error as AxiosError;
+      console.log("Error reading forecast:", error);
+      throw error;
     }
   };
 
-  const fetchGeo = async (q: string): Promise<IQueryData[] | AxiosError> => {
+  const fetchGeo = async (q: string): Promise<IQueryData[]> => {
     try {
       const response = await axiosGeoClient.get("geo/1.0/direct", {
         params: {
@@ -72,42 +115,35 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       return response?.data;
     } catch (error: unknown) {
-      return error as AxiosError;
+      console.log("Error convert string to geo-coordinates:", error);
+      throw error;
     }
   };
 
-  const defaultLocation = async () => {
+  const defaultLocation = useCallback(async () => {
     navigator.geolocation.getCurrentPosition(async function (position) {
       try {
-        const response = await fetchWeather(
-          position.coords.latitude,
-          position.coords.longitude
-        );
-        setWeather(response as IWeatherData);
-      } catch (error) {
-        console.log(error);
-      }
-    });
-  };
-  const defaultLocationForecast = async () => {
-    navigator.geolocation.getCurrentPosition(async function (position) {
-      try {
-        const response = await fetchForecast(
+        const weatherResponse = await fetchWeather(
           position.coords.latitude,
           position.coords.longitude,
-          7
+          "metric"
         );
-        setForecast(response as IForecastData[]);
+        const forecastResponse = await fetchForecast(
+          position.coords.latitude,
+          position.coords.longitude,
+          "metric"
+        );
+        setWeather(weatherResponse as IWeatherData);
+        setForecast(forecastResponse as IForecastData[]);
       } catch (error) {
-        console.log(error);
+        toast.error(error?.response?.data?.message);
       }
     });
-  };
+  }, []);
 
   useEffect(() => {
     defaultLocation();
-    defaultLocationForecast();
-  }, []);
+  }, [defaultLocation]);
 
   return (
     <WeatherContext.Provider

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ICoordProps, IForecastData } from "../utils/Interface";
 import { WeatherContext } from "../context/WeatherContext";
 import { WeatherContextData } from "../utils/types";
+import { toast } from "react-toastify";
 
 const Forecast = (props: ICoordProps) => {
   const [forecastLoading, setForecastLoading] = useState(false);
@@ -15,11 +16,10 @@ const Forecast = (props: ICoordProps) => {
       setForecastLoading(true);
 
       try {
-        const data = await fetchForecast(lat, long, 5);
+        const data = await fetchForecast(lat, long, 'metric');
         setForecast(data as IForecastData[]);
       } catch (error: unknown) {
-        console.log("error", error);
-        // toast.error(error?.response?.message);
+        toast.error(error?.response?.message);
       } finally {
         setForecastLoading(false);
       }
@@ -39,7 +39,9 @@ const Forecast = (props: ICoordProps) => {
     <div>
       {(forecast.length > 0 || forecastLoading) &&
         forecast.map((cast) => (
-          <p key={cast.weather[0].id}>Forecast: {cast.weather[0].description}</p>
+          <p key={cast.weather[0].id}>
+            Forecast: {cast.weather[0].description}
+          </p>
         ))}
     </div>
   );

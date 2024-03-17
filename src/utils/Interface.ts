@@ -1,28 +1,4 @@
 export interface IWeatherData {
-  temperature: string;
-  [key: string]: unknown;
-}
-
-export interface IQueryData {
-  lat: number;
-  lon: number;
-  name: string;
-  state: string;
-  country: string;
-}
-
-export interface IForecastData {
-  // main: {
-  //   temp: number;
-  //   feels_like: number;
-  //   temp_min: number;
-  //   temp_max: number;
-  //   pressure: number;
-  //   sea_level: number;
-  //   grnd_level: number;
-  //   humidity: number;
-  //   temp_kf: number;
-  // };
   weather: [
     {
       id: number;
@@ -31,7 +7,55 @@ export interface IForecastData {
       icon: string;
     }
   ];
-  [key: string]: unknown;
+  main: {
+    temp: number;
+    feels_like: number;
+    temp_min: number;
+    temp_max: number;
+    pressure: number;
+    humidity: number;
+    sea_level: number;
+  };
+  visibility: number;
+  wind: {
+    speed: number;
+    deg: number;
+    gust: number;
+  };
+}
+
+export interface IForecastData {
+  main: {
+    temp: number;
+    feels_like: number;
+    temp_min: number;
+    temp_max: number;
+    pressure: number;
+    humidity: number;
+  };
+  weather: [
+    {
+      id: number;
+      main: string;
+      description: string;
+      icon: string;
+    }
+  ];
+  visibility: number;
+  dt_txt: string;
+  wind: {
+    speed: number;
+    deg: number;
+    gust: number;
+  };
+}
+
+export interface IQueryData {
+  lat: number;
+  lon: number;
+  name: string;
+  state: string;
+  country: string;
 }
 
 export interface ISearchProps {

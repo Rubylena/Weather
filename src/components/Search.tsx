@@ -4,7 +4,7 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox } from "@headlessui/react";
 import { WeatherContext } from "../context/WeatherContext";
 import { WeatherContextData } from "../utils/types";
-// import { toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { IQueryData, ISearchProps } from "../utils/Interface";
 import { useDebounce } from "../helpers/debounce";
 
@@ -14,7 +14,6 @@ function classNames(...classes: string[]) {
 
 export default function Search(props: ISearchProps) {
   const [query, setQuery] = useState("");
-  // const [selectedQuery, setSelectedQuery] = useState<IQueryData | null>(null);
   const [queryResponse, setQueryResponse] = useState<IQueryData[]>([]);
   const [geoLoading, setGeoLoading] = useState(false);
   const { selectedQuery, setSelectedQuery } = props;
@@ -34,8 +33,7 @@ export default function Search(props: ISearchProps) {
         const data = await fetchGeo(q);
         setQueryResponse(data as IQueryData[]);
       } catch (error: unknown) {
-        console.log("error", error);
-        // toast.error(error?.response?.message);
+        toast.error(error?.response?.message);
       } finally {
         setGeoLoading(false);
       }
@@ -43,15 +41,12 @@ export default function Search(props: ISearchProps) {
     [fetchGeo]
   );
 
-  //   Then display the results of the search in the combobox dropdown options. Done
-  //   when any of the options is selected from the dropdown or enter is selected, first item is used if nothing is selected. Done
   useEffect(() => {
     if (debouncedSearch) {
       setQuery(debouncedSearch);
       handleSearch(debouncedSearch);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch]);
+  }, [debouncedSearch, handleSearch]);
 
   return (
     <Combobox as="div" value={selectedQuery} onChange={setSelectedQuery}>
@@ -96,9 +91,6 @@ export default function Search(props: ISearchProps) {
             {queryResponse.map((filtered, index) => (
               <Combobox.Option
                 key={index}
-                // value={`${filtered.name}${
-                //   filtered.state && `, ${filtered.state}`
-                // }`}
                 value={filtered}
                 className={({ active }) =>
                   classNames(
