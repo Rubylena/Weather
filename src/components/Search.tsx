@@ -18,7 +18,8 @@ export default function Search(props: ISearchProps) {
   const [query, setQuery] = useState("");
   const [queryResponse, setQueryResponse] = useState<IQueryData[]>([]);
   const [geoLoading, setGeoLoading] = useState(false);
-  const { selectedQuery, setSelectedQuery } = props;
+  const { setSelectedQuery } = props;
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const { fetchGeo } = React.useContext(WeatherContext) as WeatherContextData;
 
   const debouncedSearch = useDebounce(query, 500);
@@ -59,7 +60,7 @@ export default function Search(props: ISearchProps) {
   }, [debouncedSearch]);
 
   return (
-    <Combobox as="div" value={selectedQuery} onChange={setSelectedQuery}>
+    <Combobox as="div" value={selectedLocation} onChange={setSelectedLocation}>
       <div className="relative mt-2">
         <Combobox.Input
           className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"
@@ -67,7 +68,6 @@ export default function Search(props: ISearchProps) {
             setQuery(event.target.value.trim());
             setQueryResponse([]);
           }}
-          defaultValue={selectedQuery?.name}
           placeholder="City, country. E.g Lagos, NG"
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
@@ -104,13 +104,16 @@ export default function Search(props: ISearchProps) {
             {queryResponse.map((filtered, index) => (
               <Combobox.Option
                 key={index}
-                value={filtered}
+                value={`${filtered.name}${
+                  filtered.country && `, ${filtered.country}`
+                }`}
                 className={({ active }) =>
                   classNames(
                     "relative cursor-default select-none py-2 pl-3 pr-9",
                     active ? "bg-slate-600 text-white" : "text-gray-900"
                   )
                 }
+                onClick={() => setSelectedQuery(filtered)}
               >
                 {({ selected }) => (
                   <>

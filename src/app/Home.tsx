@@ -12,14 +12,11 @@ const Home = () => {
   const { unit } = useContext(WeatherContext) as WeatherContextData;
 
   return (
-    <div className="xl:h-screen xl:overflow-hidden flex flex-col">
+    <div>
       <Nav />
-      <div className="flex flex-col sm:flex-row gap-10 sm:gap-0 p-4 md:p-7 bg-[#100e1c] h-full">
+      <div className="flex flex-col sm:flex-row gap-10 sm:gap-0 p-4 md:p-7 bg-[#100e1c] 2xl:h-[calc(100vh-56px)]">
         <div className="md:w-1/4 p-3 sm:p-4 flex justify-between flex-col gap-5 rounded-l-lg rounded-r-lg sm:rounded-r-none shadow-slate-600 shadow bg-[#3f7296]">
-          <Search
-            selectedQuery={selectedQuery}
-            setSelectedQuery={setSelectedQuery}
-          />
+          <Search setSelectedQuery={setSelectedQuery} />
           <WeatherCard
             lat={selectedQuery && selectedQuery.lat}
             long={selectedQuery && selectedQuery.lon}

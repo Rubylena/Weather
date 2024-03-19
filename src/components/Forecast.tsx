@@ -63,7 +63,7 @@ const Forecast = (props: ICoordProps) => {
   return (
     <div>
       {defaultForecastLoading || forecastLoading ? (
-        <div className="flex items-center justify-center h-[calc(100vh-250px)]">
+        <div className="flex items-center justify-center">
           <svg
             aria-hidden="true"
             className={`h-24 w-24 text-gray-400 ${
@@ -90,7 +90,7 @@ const Forecast = (props: ICoordProps) => {
           {rearrangedDailyForecast.map((cast, index) => (
             <div
               key={index}
-              className="w-full sm:w-96 rounded-lg shadow drop-shadow p-2 bg-[#3f7296]"
+              className="w-full sm:w-[26rem] rounded-lg shadow drop-shadow p-2 bg-[#3f7296]"
             >
               <p className="text-center font-semibold py-2 text-xl">
                 {new Date(cast.date).toLocaleDateString("en-GB", {
@@ -104,7 +104,7 @@ const Forecast = (props: ICoordProps) => {
                 {cast.data.slice(2, 4).map((item, index) => (
                   <div
                     key={index}
-                    className="w-full sm:w-44 rounded-lg border border-gray-50 border-opacity-20 shadow-gray-400 shadow p-2 drop-shadow"
+                    className="w-full sm:w-48 rounded-lg border border-gray-50 border-opacity-20 shadow-gray-400 shadow p-2 drop-shadow"
                   >
                     <p className="text-right text-sm">
                       {new Date(item.dt * 1000).toLocaleTimeString(

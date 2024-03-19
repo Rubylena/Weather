@@ -68,7 +68,6 @@ export interface IQueryData {
 }
 
 export interface ISearchProps {
-  selectedQuery: IQueryData | null;
   setSelectedQuery: React.Dispatch<React.SetStateAction<IQueryData | null>>;
 }
 

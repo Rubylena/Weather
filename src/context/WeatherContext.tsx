@@ -53,7 +53,7 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
         params: {
           lat: latitude,
           lon: longitude,
-          cnt: 20,
+          cnt: 12,
           units: units,
           appid: import.meta.env.VITE_APP_API_ID,
         },

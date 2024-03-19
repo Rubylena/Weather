@@ -31,8 +31,19 @@ const UnitConversion = () => {
         <select
           id="tabs"
           name="tabs"
-          className="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+          className="block w-full rounded-md border-gray-300 focus:border-gray-300 focus:ring-gray-300"
           defaultValue={tabs?.find((tab) => tab.current)?.name}
+          onChange={(event) => {
+            const selectedTabIndex = tabs.findIndex(
+              (tab) => tab.name === event.target.value
+            );
+            const updatedTabs = tabs.map((tab, index) => ({
+              ...tab,
+              current: index === selectedTabIndex,
+            }));
+            setTabs(updatedTabs);
+            setUnit(updatedTabs[selectedTabIndex]?.value);
+          }}
         >
           {tabs.map((tab) => (
             <option key={tab.name}>{tab.name}</option>
@@ -48,7 +59,7 @@ const UnitConversion = () => {
                 tab.current
                   ? "bg-gray-200 text-gray-800"
                   : "text-gray-300 hover:text-gray-400",
-                "rounded-md px-3 py-2 text-sm font-medium cursor-pointer"
+                "rounded-md px-3 py-1 text-sm font-medium cursor-pointer"
               )}
               onClick={() => {
                 const updatedTabs = tabs.map((t, i) => ({
