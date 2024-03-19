@@ -3,10 +3,10 @@ import { ICoordProps, IWeatherData } from "../utils/Interface";
 import { WeatherContextData } from "../utils/types";
 import { WeatherContext } from "../context/WeatherContext";
 import { toast } from "react-toastify";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import { AxiosError } from "axios";
 import degToCompass from "../utils/compass";
 import { options } from "../utils/utils";
+import WeatherSkeleton from "./WeatherSkeleton";
 
 const WeatherCard = (props: ICoordProps) => {
   const [weatherLoading, setWeatherLoading] = useState(false);
@@ -42,19 +42,9 @@ const WeatherCard = (props: ICoordProps) => {
   }, [lat, long, units]);
 
   return (
-    <SkeletonTheme baseColor="#f2f2f2" highlightColor="#525252">
+    <>
       {defaultWeatherLoading || weatherLoading ? (
-        <div>
-          <div className="flex gap-2 items-center">
-            <div>
-              <Skeleton circle width={70} height={70} className="mb-2" />
-            </div>
-            <div>
-              <Skeleton count={1} />
-            </div>
-          </div>
-          <Skeleton count={9} />
-        </div>
+        <WeatherSkeleton />
       ) : weather ? (
         <div className="text-gray-50 flex flex-col">
           <div className="flex flex-wrap gap-1.5 items-center">
@@ -114,9 +104,14 @@ const WeatherCard = (props: ICoordProps) => {
           </div>
         </div>
       ) : (
-        <Skeleton count={9} />
+        <div className="flex gap-2 items-center md:text-center text-gray-50 h-full">
+          <p>
+            No weather data found for current location. Search location or allow
+            location on your device.
+          </p>
+        </div>
       )}
-    </SkeletonTheme>
+    </>
   );
 };
 
