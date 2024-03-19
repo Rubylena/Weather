@@ -79,7 +79,7 @@ export default function Search(props: ISearchProps) {
             aria-hidden="true"
             className={`h-5 w-5 text-gray-400 mr-3 ${
               geoLoading ? "animate-spin block" : "hidden"
-            }  dark:text-gray-600 fill-blue-600`}
+            }  dark:text-gray-600 fill-[#1e213b]`}
             viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"

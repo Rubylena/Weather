@@ -44,7 +44,7 @@ const WeatherCard = (props: ICoordProps) => {
   return (
     <>
       {defaultWeatherLoading || weatherLoading ? (
-        <Skeleton count={14} />
+        <Skeleton count={9} height="2rem" />
       ) : weather ? (
         <div className="text-gray-50 flex flex-col gap-1">
           <div className="flex flex-wrap gap-2 items-center">
@@ -101,7 +101,7 @@ const WeatherCard = (props: ICoordProps) => {
           </p>
         </div>
       ) : (
-        <Skeleton count={14} />
+        <Skeleton count={9} height="2rem" />
       )}
     </>
   );
