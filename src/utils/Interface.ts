@@ -1,4 +1,12 @@
 export interface IWeatherData {
+  default: boolean;
+  name: string;
+  dt: number;
+  sys: {
+    country: string;
+    sunrise: number;
+    sunset: number;
+  };
   weather: [
     {
       id: number;
@@ -43,6 +51,7 @@ export interface IForecastData {
   ];
   visibility: number;
   dt_txt: string;
+  dt: number;
   wind: {
     speed: number;
     deg: number;
@@ -67,4 +76,18 @@ export interface ICoordProps {
   lat?: number | null;
   long?: number | null;
   units?: string;
+}
+
+export interface IDateTimeFormatOptions {
+  // year: "numeric";
+  // month: "numeric";
+  // day: "numeric";
+  hour: "numeric";
+  minute: "numeric";
+  hour12: true;
+}
+
+export interface IDailyWeatherData {
+  date: string;
+  data: IForecastData[];
 }

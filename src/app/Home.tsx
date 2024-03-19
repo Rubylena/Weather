@@ -1,35 +1,50 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Search from "../components/Search";
 import { IQueryData } from "../utils/Interface";
 import WeatherCard from "../components/WeatherCard";
 import Forecast from "../components/Forecast";
+import { WeatherContext } from "../context/WeatherContext";
+import { WeatherContextData } from "../utils/types";
+import UnitConversion from "../components/UnitConversion";
+import Nav from "../components/Nav";
 
 const Home = () => {
   const [selectedQuery, setSelectedQuery] = useState<IQueryData | null>(null);
-  const [units, setUnits] = useState<string>("metric");
+  const { unit } = useContext(WeatherContext) as WeatherContextData;
 
   return (
-    <div className="flex flex-col gap-10 p-10">
-      <Search
-        selectedQuery={selectedQuery}
-        setSelectedQuery={setSelectedQuery}
-      />
-      {/* use tailwind tab here, maybe just beside search or under search */}
-      <div>
-        <p onClick={()=> setUnits('metric')}>Celsius</p>
-        <p onClick={()=> setUnits('imperial')}>Fahrenheit</p>
+    <div className="xl:h-screen flex flex-col">
+      <Nav />
+      <div className="flex flex-col sm:flex-row gap-10 sm:gap-0 p-4 md:p-7 bg-[#100e1c] h-full">
+        <div className="md:w-1/4 p-3 sm:p-4 flex justify-between flex-col gap-5 rounded-l-lg rounded-r-lg sm:rounded-r-none shadow-slate-600 shadow bg-[#3f7296]">
+          <Search
+            selectedQuery={selectedQuery}
+            setSelectedQuery={setSelectedQuery}
+          />
+          <WeatherCard
+            lat={selectedQuery && selectedQuery.lat}
+            long={selectedQuery && selectedQuery.lon}
+            units={unit}
+          />
+        </div>
+
+        <div className="md:w-3/4 p-3 sm:p-5 flex justify-between flex-col gap-5 rounded-r-lg rounded-l-lg sm:rounded-l-none shadow-slate-600 shadow bg-[#1e213b]">
+          <div className="flex justify-end">
+            <UnitConversion />
+          </div>
+
+          <div>
+            <h2 className="text-white font-bold text-xl sm:text-4xl mb-3">
+              Forecast
+            </h2>
+            <Forecast
+              lat={selectedQuery && selectedQuery.lat}
+              long={selectedQuery && selectedQuery.lon}
+              units={unit}
+            />
+          </div>
+        </div>
       </div>
-
-      <WeatherCard
-        lat={selectedQuery && selectedQuery.lat}
-        long={selectedQuery && selectedQuery.lon}
-        units={units}
-      />
-
-      <Forecast
-        lat={selectedQuery && selectedQuery.lat}
-        long={selectedQuery && selectedQuery.lon}
-      />
     </div>
   );
 };

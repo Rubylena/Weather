@@ -16,6 +16,8 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
   const [forecast, setForecast] = useState<IForecastData[] | undefined>();
   const [defaultForecastLoading, setDefaultForecastLoading] = useState(false);
 
+  const [unit, setUnit] = useState<string>("metric");
+
   const fetchWeather = async (
     latitude: number,
     longitude: number,
@@ -51,6 +53,7 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
         params: {
           lat: latitude,
           lon: longitude,
+          cnt: 20,
           units: units,
           appid: import.meta.env.VITE_APP_API_ID,
         },
@@ -85,14 +88,16 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
         const weatherResponse = await fetchWeather(
           position.coords.latitude,
           position.coords.longitude,
-          "metric"
+          unit
         );
         const forecastResponse = await fetchForecast(
           position.coords.latitude,
           position.coords.longitude,
-          "metric"
+          unit
         );
-        setWeather(weatherResponse as IWeatherData);
+        const weatherData = weatherResponse as IWeatherData;
+        weatherData.default = true;
+        setWeather(weatherData);
         setForecast(forecastResponse as IForecastData[]);
       } catch (error) {
         if (error instanceof AxiosError) {
@@ -102,11 +107,19 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
     });
-  }, []);
+  }, [unit]);
+
+  useEffect(() => {
+    if (weather?.default) {
+      defaultLocation();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultLocation, unit]);
 
   useEffect(() => {
     defaultLocation();
-  }, [defaultLocation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <WeatherContext.Provider
@@ -116,6 +129,8 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
         setWeather,
         defaultForecastLoading,
         forecast,
+        unit,
+        setUnit,
         setForecast,
         fetchWeather,
         fetchForecast,
