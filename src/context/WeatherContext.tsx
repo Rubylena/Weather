@@ -23,7 +23,6 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
     longitude: number,
     units: string
   ): Promise<IWeatherData> => {
-    setDefaultWeatherLoading(true);
     try {
       const response = await axiosClient.get("weather", {
         params: {
@@ -37,8 +36,6 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (error: unknown) {
       console.log("Error getting weather data", error);
       throw error;
-    } finally {
-      setDefaultWeatherLoading(false);
     }
   };
 
@@ -47,7 +44,6 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
     longitude: number,
     units: string
   ): Promise<IForecastData[]> => {
-    setDefaultForecastLoading(true);
     try {
       const response = await axiosClient.get("forecast", {
         params: {
@@ -62,8 +58,6 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (error: unknown) {
       console.log("Error reading forecast:", error);
       throw error;
-    } finally {
-      setDefaultForecastLoading(false);
     }
   };
 
@@ -85,6 +79,9 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
   const defaultLocation = useCallback(async () => {
     navigator.geolocation.getCurrentPosition(async (position) => {
       try {
+        setDefaultWeatherLoading(true);
+        setDefaultForecastLoading(true);
+
         const weatherResponse = await fetchWeather(
           position.coords.latitude,
           position.coords.longitude,
@@ -105,6 +102,9 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
         } else {
           toast.error("An unknown error occurred.");
         }
+      } finally {
+        setDefaultForecastLoading(false);
+        setDefaultWeatherLoading(false);
       }
     });
   }, [unit]);
@@ -114,7 +114,7 @@ const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({
       defaultLocation();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultLocation, unit]);
+  }, [unit]);
 
   useEffect(() => {
     defaultLocation();

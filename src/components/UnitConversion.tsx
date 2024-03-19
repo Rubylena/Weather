@@ -32,7 +32,7 @@ const UnitConversion = () => {
           id="tabs"
           name="tabs"
           className="block w-full rounded-md border-gray-300 focus:border-gray-300 focus:ring-gray-300"
-          defaultValue={tabs?.find((tab) => tab.current)?.name}
+          value={tabs?.find((tab) => tab.current === true)?.name}
           onChange={(event) => {
             const selectedTabIndex = tabs.findIndex(
               (tab) => tab.name === event.target.value

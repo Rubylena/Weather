@@ -119,7 +119,7 @@ const Forecast = (props: ICoordProps) => {
                       />
                       <p className="font-medium text-lg">
                         {Math.ceil(item.main.temp)}&deg;
-                        {units === "metric" ? "C" : "F"}
+                        {!forecastLoading && (units === "metric" ? "C" : "F")}
                       </p>
                     </div>
                     <p className="capitalize">{item.weather[0].description}</p>

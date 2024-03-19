@@ -3,7 +3,7 @@ import { ICoordProps, IWeatherData } from "../utils/Interface";
 import { WeatherContextData } from "../utils/types";
 import { WeatherContext } from "../context/WeatherContext";
 import { toast } from "react-toastify";
-import Skeleton from "react-loading-skeleton";
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import { AxiosError } from "axios";
 import degToCompass from "../utils/compass";
 import { options } from "../utils/utils";
@@ -42,12 +42,23 @@ const WeatherCard = (props: ICoordProps) => {
   }, [lat, long, units]);
 
   return (
-    <>
+    <SkeletonTheme baseColor="#f2f2f2" highlightColor="#525252">
       {defaultWeatherLoading || weatherLoading ? (
-        <Skeleton count={9} height="2rem" />
+        <div>
+          <div className="flex gap-2 items-center">
+            <div>
+              <Skeleton circle width={70} height={70} className="mb-2" />
+            </div>
+            <div>
+              <Skeleton count={1} />
+            </div>
+          </div>
+          <Skeleton count={9} />
+        </div>
       ) : weather ? (
-        <div className="text-gray-50 flex flex-col gap-1">
-          <div className="flex flex-wrap gap-2 items-center">
+        <div className="text-gray-50 flex flex-col">
+          <div className="flex flex-wrap gap-1.5 items-center">
+            {/* Ath, BE */}
             <img
               src={`https://openweathermap.org/img/wn/${weather?.weather[0]?.icon}@2x.png`}
               alt="weather icon"
@@ -85,25 +96,27 @@ const WeatherCard = (props: ICoordProps) => {
           </p>
           <p>Visibility: {weather.visibility}km</p>
           <p>Pressure: {weather.main.pressure}hPa</p>
-          <p>
-            Sunrise:{" "}
-            {new Date(weather.sys.sunrise * 1000).toLocaleString(
-              "en-GB",
-              options
-            )}
-          </p>
-          <p>
-            Sunset:{" "}
-            {new Date(weather.sys.sunset * 1000).toLocaleString(
-              "en-GB",
-              options
-            )}
-          </p>
+          <div className="flex flex-col lg:flex-row gap-1.5">
+            <p>
+              Sunrise:{" "}
+              {new Date(weather.sys.sunrise * 1000).toLocaleString(
+                "en-GB",
+                options
+              )}
+            </p>
+            <p>
+              Sunset:{" "}
+              {new Date(weather.sys.sunset * 1000).toLocaleString(
+                "en-GB",
+                options
+              )}
+            </p>
+          </div>
         </div>
       ) : (
-        <Skeleton count={9} height="2rem" />
+        <Skeleton count={9} />
       )}
-    </>
+    </SkeletonTheme>
   );
 };
 
