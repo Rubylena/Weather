@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { WeatherContext } from "../context/WeatherContext";
 import { WeatherContextData } from "../utils/types";
 
@@ -6,9 +6,19 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 const UnitConversion = () => {
+  const { unit } = useContext(WeatherContext) as WeatherContextData;
+
   const [tabs, setTabs] = useState([
-    { name: "Celsius", current: true, value: "metric" },
-    { name: "Fahrenheit", current: false, value: "imperial" },
+    {
+      name: "Celsius",
+      current: unit === "metric" ? true : false,
+      value: "metric",
+    },
+    {
+      name: "Fahrenheit",
+      current: unit === "imperial" ? true : false,
+      value: "imperial",
+    },
   ]);
 
   const { setUnit } = React.useContext(WeatherContext) as WeatherContextData;

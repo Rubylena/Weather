@@ -44,7 +44,6 @@ const Forecast = (props: ICoordProps) => {
 
   const collectDaily = async (forecast: IForecastData[]) => {
     const response = await dailyDataExtraction(forecast);
-    console.log(response);
     setRearrangedDailyForecast(response);
   };
 
@@ -64,7 +63,7 @@ const Forecast = (props: ICoordProps) => {
   return (
     <div>
       {defaultForecastLoading || forecastLoading ? (
-        <Skeleton height="20rem" />
+        <Skeleton height="35rem" />
       ) : rearrangedDailyForecast && rearrangedDailyForecast?.length > 0 ? (
         <div className="flex flex-wrap gap-5 justify-center text-gray-50">
           {rearrangedDailyForecast.map((cast, index) => (

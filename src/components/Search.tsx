@@ -122,16 +122,6 @@ export default function Search(props: ISearchProps) {
                     >
                       {filtered.name}, {filtered.state}
                     </span>
-                    {/* 
-                    {selected && (
-                      <span
-                        className={classNames(
-                          "absolute inset-y-0 right-0 flex items-center pr-4",
-                        )}
-                      >
-                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                      </span>
-                    )} */}
                   </>
                 )}
               </Combobox.Option>
@@ -145,7 +135,7 @@ export default function Search(props: ISearchProps) {
                 "relative cursor-default select-none py-3 pl-3 pr-9 text-gray-900 text-center"
               )}
             >
-              <span>Nothing to show</span>
+              <span>Nothing to show. Search for another location.</span>
             </Combobox.Option>
           </Combobox.Options>
         )}
